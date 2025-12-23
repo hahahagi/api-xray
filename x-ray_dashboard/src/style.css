@@ -1,0 +1,70 @@
+:root {
+  --vue-green: #41b883;
+  --vue-blue: #34495e;
+  --sidebar-width: 260px;
+  --bg-light: #f4f6f8;
+}
+
+body {
+  background-color: var(--bg-light);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Transisi halus untuk sidebar */
+#wrapper {
+  display: flex;
+  width: 100%;
+  align-items: stretch;
+  transition: all 0.3s;
+}
+
+#sidebar {
+  min-width: var(--sidebar-width);
+  max-width: var(--sidebar-width);
+  background: var(--vue-blue);
+  color: #fff;
+  min-height: 100vh;
+  transition: all 0.3s;
+}
+
+#sidebar.active {
+  margin-left: calc(var(--sidebar-width) * -1);
+}
+
+/* Styling Menu Link */
+#sidebar ul.components {
+  padding: 20px 0;
+  border-bottom: 1px solid #47748b;
+}
+
+#sidebar ul li a {
+  padding: 15px 25px;
+  font-size: 1.1em;
+  display: block;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+#sidebar ul li a:hover,
+#sidebar ul li a.router-link-active {
+  color: #fff;
+  background: var(--vue-green);
+  padding-left: 30px; /* Efek geser sedikit saat hover */
+}
+
+/* Content Area */
+#content {
+  width: 100%;
+  padding: 0;
+  min-height: 100vh;
+  transition: all 0.3s;
+}
+
+/* Navbar Custom */
+.navbar-custom {
+  background: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  padding: 15px 30px;
+}
