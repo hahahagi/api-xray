@@ -1,4 +1,8 @@
-<?php include 'koneksi.php'; ?>
+<?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+include 'koneksi.php';
+?>
 <!DOCTYPE html>
 <html lang="id">
 
