@@ -1,70 +1,93 @@
+/* style.css - Global Styles */
 :root {
-  --vue-green: #41b883;
-  --vue-blue: #34495e;
-  --sidebar-width: 260px;
-  --bg-light: #f4f6f8;
+  /* Industrial Theme Colors */
+  --industrial-blue: #1a237e;
+  --industrial-dark: #121828;
+  --industrial-gray: #2d3748;
+  --industrial-light: #4a5568;
+  --industrial-accent: #2196f3;
+  --industrial-success: #4caf50;
+  --industrial-warning: #ff9800;
+  --industrial-danger: #f44336;
+  --industrial-bg: #f5f7fa;
+  --gauge-green: #00e676;
+  --gauge-yellow: #ffeb3b;
+  --gauge-red: #ff5252;
+  
+  /* Shadows */
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+  
+  /* Border Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  
+  /* Transitions */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-  background-color: var(--bg-light);
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  overflow-x: hidden;
-}
-
-/* Transisi halus untuk sidebar */
-#wrapper {
-  display: flex;
-  width: 100%;
-  align-items: stretch;
-  transition: all 0.3s;
-}
-
-#sidebar {
-  min-width: var(--sidebar-width);
-  max-width: var(--sidebar-width);
-  background: var(--vue-blue);
-  color: #fff;
+  font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
-  transition: all 0.3s;
 }
 
-#sidebar.active {
-  margin-left: calc(var(--sidebar-width) * -1);
+/* Industrial Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@300;400;500&display=swap');
+
+.industrial-font {
+  font-family: 'Inter', sans-serif;
 }
 
-/* Styling Menu Link */
-#sidebar ul.components {
-  padding: 20px 0;
-  border-bottom: 1px solid #47748b;
+.mono-font {
+  font-family: 'Roboto Mono', monospace;
 }
 
-#sidebar ul li a {
-  padding: 15px 25px;
-  font-size: 1.1em;
-  display: block;
-  color: rgba(255, 255, 255, 0.8);
-  text-decoration: none;
-  transition: 0.2s;
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-#sidebar ul li a:hover,
-#sidebar ul li a.router-link-active {
-  color: #fff;
-  background: var(--vue-green);
-  padding-left: 30px; /* Efek geser sedikit saat hover */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
 }
 
-/* Content Area */
-#content {
-  width: 100%;
-  padding: 0;
-  min-height: 100vh;
-  transition: all 0.3s;
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
 }
 
-/* Navbar Custom */
-.navbar-custom {
-  background: #fff;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-  padding: 15px 30px;
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Utility Classes */
+.text-gradient {
+  background: linear-gradient(45deg, var(--industrial-accent), #64b5f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.glow {
+  box-shadow: 0 0 20px rgba(33, 150, 243, 0.3);
+}
+
+.glow-success {
+  box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+}
+
+.glow-danger {
+  box-shadow: 0 0 20px rgba(244, 67, 54, 0.3);
 }
