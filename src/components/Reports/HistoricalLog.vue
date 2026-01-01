@@ -1,19 +1,23 @@
 <template>
-  <div class="historical-log card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <h5 class="mb-0">Historical Machine Log</h5>
-      <div class="date-filter">
-        <input 
-          type="date" 
-          v-model="selectedDate" 
+  <div class="historical-log card border-0 shadow-sm">
+    <div
+      class="card-header bg-white py-3 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3"
+    >
+      <h5 class="mb-0 fw-bold text-primary">
+        <i class="bi bi-clock-history me-2"></i>Historical Machine Log
+      </h5>
+      <div class="date-filter w-100 w-sm-auto">
+        <input
+          type="date"
+          v-model="selectedDate"
           @change="fetchLogData"
           class="form-control form-control-sm"
-        >
+        />
       </div>
     </div>
     <div class="card-body">
-      <div class="table-responsive">
-        <table class="table table-hover table-sm">
+      <div class="table-responsive mb-4">
+        <table class="table table-hover table-sm align-middle">
           <thead class="table-light">
             <tr>
               <th>#</th>
@@ -29,19 +33,31 @@
               <td>{{ index + 1 }}</td>
               <td>{{ formatDateTime(log.timestamp) }}</td>
               <td>
-                <span :class="`badge ${log.status === 'ON' ? 'bg-success' : 'bg-danger'}`">
+                <span
+                  :class="`badge ${
+                    log.status === 'ON'
+                      ? 'bg-success-subtle text-success'
+                      : 'bg-danger-subtle text-danger'
+                  }`"
+                >
                   {{ log.status }}
                 </span>
               </td>
-              <td>{{ log.duration || 'N/A' }}</td>
+              <td>{{ log.duration || "N/A" }}</td>
               <td>
-                <span :class="`badge ${log.type === 'Runtime' ? 'bg-info' : 'bg-warning'}`">
+                <span
+                  :class="`badge ${
+                    log.type === 'Runtime'
+                      ? 'bg-info-subtle text-info'
+                      : 'bg-warning-subtle text-warning'
+                  }`"
+                >
                   {{ log.type }}
                 </span>
               </td>
               <td>
-                <button 
-                  @click="showLogDetails(log)" 
+                <button
+                  @click="showLogDetails(log)"
                   class="btn btn-sm btn-outline-primary"
                 >
                   <i class="bi bi-eye"></i>
@@ -56,29 +72,41 @@
           </tbody>
         </table>
       </div>
-      
+
       <!-- Summary Statistics -->
-      <div class="summary-stats mt-4">
-        <div class="row">
-          <div class="col-md-4">
-            <div class="stat-card bg-light p-3 rounded">
-              <div class="stat-label text-muted">Total Runtime</div>
-              <div class="stat-value h4">{{ totalRuntime }}</div>
-              <div class="stat-unit">Minutes</div>
+      <div class="summary-stats">
+        <div class="row g-3">
+          <div class="col-12 col-md-4">
+            <div class="stat-card bg-light p-3 rounded border h-100">
+              <div class="stat-label text-muted small text-uppercase fw-bold">
+                Total Runtime
+              </div>
+              <div class="stat-value h4 mb-0 text-primary">
+                {{ totalRuntime }}
+              </div>
+              <div class="stat-unit small text-muted">Minutes</div>
             </div>
           </div>
-          <div class="col-md-4">
-            <div class="stat-card bg-light p-3 rounded">
-              <div class="stat-label text-muted">Total Downtime</div>
-              <div class="stat-value h4">{{ totalDowntime }}</div>
-              <div class="stat-unit">Minutes</div>
+          <div class="col-12 col-md-4">
+            <div class="stat-card bg-light p-3 rounded border h-100">
+              <div class="stat-label text-muted small text-uppercase fw-bold">
+                Total Downtime
+              </div>
+              <div class="stat-value h4 mb-0 text-danger">
+                {{ totalDowntime }}
+              </div>
+              <div class="stat-unit small text-muted">Minutes</div>
             </div>
           </div>
-          <div class="col-md-4">
-            <div class="stat-card bg-light p-3 rounded">
-              <div class="stat-label text-muted">Machine Cycles</div>
-              <div class="stat-value h4">{{ cycleCount }}</div>
-              <div class="stat-unit">Times</div>
+          <div class="col-12 col-md-4">
+            <div class="stat-card bg-light p-3 rounded border h-100">
+              <div class="stat-label text-muted small text-uppercase fw-bold">
+                Machine Cycles
+              </div>
+              <div class="stat-value h4 mb-0 text-success">
+                {{ cycleCount }}
+              </div>
+              <div class="stat-unit small text-muted">Times</div>
             </div>
           </div>
         </div>
@@ -88,87 +116,96 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import apiClient from '../../api'
+import { ref, computed, onMounted } from "vue";
+import apiClient from "../../api";
 
-const selectedDate = ref(new Date().toISOString().split('T')[0])
-const rawLogs = ref([])
-const processedLogs = ref([])
+const selectedDate = ref(new Date().toISOString().split("T")[0]);
+const rawLogs = ref([]);
+const processedLogs = ref([]);
 
 // Summary statistics
-const totalRuntime = ref(0)
-const totalDowntime = ref(0)
-const cycleCount = ref(0)
+const totalRuntime = ref(0);
+const totalDowntime = ref(0);
+const cycleCount = ref(0);
 
 const fetchLogData = async () => {
   try {
-    const response = await apiClient.get('', {
+    const response = await apiClient.get("", {
       params: {
-        mode: 'get_historical_log',
-        date: selectedDate.value
-      }
-    })
-    
-    rawLogs.value = response.data.logs || []
-    processLogs()
+        mode: "get_machine_logs",
+        date: selectedDate.value,
+      },
+    });
+
+    // Sort logs ASC for processing duration
+    const logs = response.data.data || [];
+    rawLogs.value = logs.sort(
+      (a, b) => new Date(a.timestamp) - new Date(b.timestamp)
+    );
+
+    processLogs();
   } catch (error) {
-    console.error('Error fetching log data:', error)
+    console.error("Error fetching log data:", error);
   }
-}
+};
 
 const processLogs = () => {
-  processedLogs.value = []
-  totalRuntime.value = 0
-  totalDowntime.value = 0
-  cycleCount.value = 0
-  
+  processedLogs.value = [];
+  totalRuntime.value = 0;
+  totalDowntime.value = 0;
+  cycleCount.value = 0;
+
   for (let i = 0; i < rawLogs.value.length - 1; i++) {
-    const current = rawLogs.value[i]
-    const next = rawLogs.value[i + 1]
-    
-    const startTime = new Date(current.timestamp)
-    const endTime = new Date(next.timestamp)
-    const duration = Math.round((endTime - startTime) / (1000 * 60)) // in minutes
-    
+    const current = rawLogs.value[i];
+    const next = rawLogs.value[i + 1];
+
+    const startTime = new Date(current.timestamp);
+    const endTime = new Date(next.timestamp);
+    const duration = Math.round((endTime - startTime) / (1000 * 60)); // in minutes
+
     processedLogs.value.push({
       id: current.id,
       timestamp: current.timestamp,
       status: current.status,
       duration: duration,
-      type: current.status === 'ON' ? 'Runtime' : 'Downtime'
-    })
-    
-    if (current.status === 'ON') {
-      totalRuntime.value += duration
+      type: current.status === "ON" ? "Runtime" : "Downtime",
+    });
+
+    if (current.status === "ON") {
+      totalRuntime.value += duration;
     } else {
-      totalDowntime.value += duration
+      totalDowntime.value += duration;
     }
-    
-    if (current.status === 'ON' && next.status === 'OFF') {
-      cycleCount.value++
+
+    if (current.status === "ON" && next.status === "OFF") {
+      cycleCount.value++;
     }
   }
-}
+};
 
 const formatDateTime = (datetime) => {
-  const date = new Date(datetime)
-  return date.toLocaleString('id-ID', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit'
-  })
-}
+  const date = new Date(datetime);
+  return date.toLocaleString("id-ID", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
+};
 
 const showLogDetails = (log) => {
-  alert(`Log Details:\n\nTimestamp: ${formatDateTime(log.timestamp)}\nStatus: ${log.status}\nDuration: ${log.duration} minutes\nType: ${log.type}`)
-}
+  alert(
+    `Log Details:\n\nTimestamp: ${formatDateTime(log.timestamp)}\nStatus: ${
+      log.status
+    }\nDuration: ${log.duration} minutes\nType: ${log.type}`
+  );
+};
 
 onMounted(() => {
-  fetchLogData()
-})
+  fetchLogData();
+});
 </script>
 
 <style scoped>

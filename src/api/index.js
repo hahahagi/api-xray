@@ -1,7 +1,12 @@
 import axios from "axios";
 
+// Determine base URL based on environment
+// In development: use Vite proxy (/api-proxy)
+// In production: use direct file path (./api.php) since api.php is in the same folder
+const baseURL = import.meta.env.DEV ? "/api-proxy" : "./api.php";
+
 const apiClient = axios.create({
-  baseURL: "/api-proxy", // Uses Vite proxy to avoid CORS
+  baseURL: baseURL,
   headers: {
     "Content-Type": "application/json",
   },

@@ -1,111 +1,95 @@
 <!-- src/views/HomeView.vue -->
 <template>
-  <div class="dashboard-clean">
-    <!-- Header -->
-    <header class="dashboard-header">
-      <div class="container-fluid">
-        <div class="header-content">
-          <div class="header-left">
-            <div class="logo">
-              <i class="bi bi-cpu"></i>
-            </div>
-            <div>
-              <h1>X-Ray Monitor</h1>
-              <p class="subtitle">Tire Inspection System</p>
-            </div>
-          </div>
-          <div class="header-right">
-            <div class="time-display">
-              <div class="time">{{ currentTime }}</div>
-              <div class="date">{{ currentDate }}</div>
-            </div>
-          </div>
+  <div class="home-view">
+    <div class="container-fluid p-4">
+      <!-- Header -->
+      <div class="row mb-4 align-items-center">
+        <div class="col">
+          <h1 class="mb-1">X-Ray Inspection Monitor</h1>
+          <p class="text-muted">Real-time Production Dashboard</p>
+        </div>
+        <div class="col-auto text-end">
+          <div class="h4 mb-0 fw-bold text-primary">{{ currentTime }}</div>
+          <div class="text-muted small">{{ currentDate }}</div>
         </div>
       </div>
-    </header>
 
-    <!-- Main Content -->
-    <main class="dashboard-main">
-      <div class="container-fluid">
-        <div class="row">
-          <!-- Sidebar: Machine Control -->
-          <div class="col-lg-4">
-            <div class="sidebar">
-              <MachineControl />
-            </div>
-          </div>
-          
-          <!-- Main: Dashboard -->
-          <div class="col-lg-8">
-            <div class="main-content">
-              <DashboardVisuals />
-            </div>
-          </div>
+      <!-- Main Grid Layout -->
+      <div class="row g-4">
+        <!-- Top Row -->
+        <div class="col-xl-3 col-lg-4 col-md-6">
+          <MachineControl />
         </div>
-      </div>
-    </main>
+        <div class="col-xl-6 col-lg-4 col-md-12">
+          <DashboardVisuals />
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6">
+          <QualitySummary />
+        </div>
 
-    <!-- Footer -->
-    <footer class="dashboard-footer">
-      <div class="container-fluid">
-        <div class="footer-content">
-          <div class="footer-left">
-            <span class="connection-status">
-              <span class="status-dot connected"></span>
-              Connected to X-Ray Machine
-            </span>
-          </div>
-          <div class="footer-center">
-            <span class="refresh-info">
-              <i class="bi bi-arrow-clockwise"></i>
-              Auto-refresh: 10s
-            </span>
-          </div>
-          <div class="footer-right">
-            <span class="version">v2.0</span>
-          </div>
+        <!-- Bottom Row -->
+        <div class="col-xl-3 col-lg-4 col-md-6">
+          <OperationTime />
+        </div>
+        <div class="col-xl-6 col-lg-4 col-md-12">
+          <ProductionOutput />
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6">
+          <SystemLog />
         </div>
       </div>
-    </footer>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
-import MachineControl from '../components/Dashboard/MachineControl.vue'
-import DashboardVisuals from '../components/Dashboard/DashboardVisuals.vue'
+import { ref, onMounted, onUnmounted } from "vue";
+import { useMachineStore } from "../stores/machineStore";
+import MachineControl from "../components/Dashboard/MachineControl.vue";
+import DashboardVisuals from "../components/Dashboard/DashboardVisuals.vue";
+import OperationTime from "../components/Dashboard/OperationTime.vue";
+import ProductionOutput from "../components/Dashboard/ProductionOutput.vue";
+import QualitySummary from "../components/Dashboard/QualitySummary.vue";
+import SystemLog from "../components/Dashboard/SystemLog.vue";
 
-const currentTime = ref('')
-const currentDate = ref('')
+const machineStore = useMachineStore();
+const currentTime = ref("");
+const currentDate = ref("");
 
 function updateDateTime() {
-  const now = new Date()
-  
-  currentTime.value = now.toLocaleTimeString('en-US', {
-    hour12: false,
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit'
-  })
-  
-  currentDate.value = now.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
-  })
+  const now = new Date();
+  currentTime.value = now.toLocaleTimeString("en-US", { hour12: false });
+  currentDate.value = now.toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 }
 
-let timeInterval
+let timeInterval;
+let dataInterval;
 
 onMounted(() => {
-  updateDateTime()
-  timeInterval = setInterval(updateDateTime, 1000)
-})
+  updateDateTime();
+  timeInterval = setInterval(updateDateTime, 1000);
+  machineStore.fetchDashboardData();
+
+  // Poll data every 2 seconds
+  dataInterval = setInterval(() => {
+    machineStore.fetchDashboardData(true);
+  }, 2000);
+});
 
 onUnmounted(() => {
-  clearInterval(timeInterval)
-})
+  clearInterval(timeInterval);
+  clearInterval(dataInterval);
+});
 </script>
+
+<style scoped>
+/* Scoped styles if needed, mostly using global style.css */
+</style>
 
 <style scoped>
 .dashboard-clean {
@@ -169,7 +153,7 @@ onUnmounted(() => {
   font-size: 1.125rem;
   font-weight: 600;
   color: #111827;
-  font-family: 'Roboto Mono', monospace;
+  font-family: "Roboto Mono", monospace;
 }
 
 .date {
@@ -247,7 +231,7 @@ onUnmounted(() => {
 }
 
 .version {
-  font-family: 'Roboto Mono', monospace;
+  font-family: "Roboto Mono", monospace;
   font-weight: 600;
   color: #374151;
 }
@@ -258,23 +242,23 @@ onUnmounted(() => {
     position: static;
     margin-bottom: 1.5rem;
   }
-  
+
   .header-content {
     flex-direction: column;
     gap: 1rem;
     text-align: center;
   }
-  
+
   .time-display {
     text-align: center;
   }
-  
+
   .footer-content {
     flex-direction: column;
     gap: 0.5rem;
     text-align: center;
   }
-  
+
   .footer-left,
   .footer-center,
   .footer-right {
@@ -284,7 +268,12 @@ onUnmounted(() => {
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 </style>

@@ -30,7 +30,12 @@
     <div class="sidebar-divider"></div>
 
     <nav class="sidebar-nav">
-      <router-link to="/" class="nav-item" active-class="active">
+      <router-link
+        to="/"
+        class="nav-item"
+        active-class="active"
+        @click="handleNavClick"
+      >
         <div class="nav-icon">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
             <path
@@ -49,7 +54,12 @@
         <div class="nav-indicator"></div>
       </router-link>
 
-      <router-link to="/report" class="nav-item" active-class="active">
+      <router-link
+        to="/report"
+        class="nav-item"
+        active-class="active"
+        @click="handleNavClick"
+      >
         <div class="nav-icon">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
             <path
@@ -86,33 +96,6 @@
           </svg>
         </div>
         <span class="nav-text">REPORTS</span>
-        <div class="nav-indicator"></div>
-      </router-link>
-
-      <router-link to="/analytics" class="nav-item" active-class="active">
-        <div class="nav-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
-              stroke="currentColor"
-              stroke-width="2"
-            />
-            <polyline
-              points="3.27 6.96 12 12.01 20.73 6.96"
-              stroke="currentColor"
-              stroke-width="2"
-            />
-            <line
-              x1="12"
-              y1="22.08"
-              x2="12"
-              y2="12"
-              stroke="currentColor"
-              stroke-width="2"
-            />
-          </svg>
-        </div>
-        <span class="nav-text">ANALYTICS</span>
         <div class="nav-indicator"></div>
       </router-link>
     </nav>
@@ -162,6 +145,12 @@ function onToggle() {
   uiStore.toggleSidebar();
 }
 
+function handleNavClick() {
+  if (window.innerWidth < 992) {
+    uiStore.setSidebar(false);
+  }
+}
+
 function syncVisibility() {
   uiStore.setSidebar(window.innerWidth >= 992);
 }
@@ -192,31 +181,27 @@ watch(
 <style scoped>
 .sidebar-industrial {
   width: 260px;
-  background: linear-gradient(180deg, var(--industrial-dark) 0%, #1a202c 100%);
+  background: var(--bg-sidebar);
   border-right: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   flex-direction: column;
   height: 100vh;
   position: sticky;
   top: 0;
+  z-index: 1000;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Hidden state for small screens */
+/* Hidden state */
 .sidebar-industrial.hidden {
-  transform: translateX(-110%);
-  transition: transform 0.25s ease;
-  position: fixed;
-  z-index: 2000;
-  left: 0;
-  top: 0;
-  height: 100vh;
+  transform: translateX(-100%);
 }
 
 /* Overlay when sidebar is visible on mobile */
 .sidebar-overlay {
   display: none;
   opacity: 0;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.3s ease;
   pointer-events: none;
 }
 
@@ -226,16 +211,20 @@ watch(
     left: 0;
     top: 0;
     height: 100vh;
-    transform: translateX(-110%);
+    z-index: 3000;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
   }
-  .sidebar-industrial:not(.hidden) {
-    transform: translateX(0);
+
+  .sidebar-industrial.hidden {
+    transform: translateX(-100%);
+    box-shadow: none;
   }
+
   .sidebar-overlay {
     display: block;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.35);
+    background: rgba(0, 0, 0, 0.5);
     z-index: 1990;
     opacity: 1;
     pointer-events: auto;
@@ -273,7 +262,7 @@ watch(
 
 .company-sector {
   font-size: 0.75rem;
-  color: var(--industrial-accent);
+  color: var(--primary);
   font-weight: 600;
   letter-spacing: 0.5px;
 }
@@ -315,8 +304,8 @@ watch(
 
 .nav-item.active {
   color: white;
-  background: rgba(33, 150, 243, 0.1);
-  border-left: 3px solid var(--industrial-accent);
+  background: rgba(37, 99, 235, 0.1);
+  border-left: 3px solid var(--primary);
 }
 
 .nav-item.active .nav-indicator {
@@ -341,7 +330,7 @@ watch(
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--industrial-accent);
+  background: var(--primary);
   opacity: 0;
   transform: scale(0);
   transition: all var(--transition-normal);
@@ -387,22 +376,22 @@ watch(
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem;
-  background: rgba(76, 175, 80, 0.1);
+  background: rgba(16, 185, 129, 0.1);
   border-radius: var(--radius-sm);
-  border: 1px solid rgba(76, 175, 80, 0.2);
+  border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
 .connection-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--industrial-success);
+  background: var(--status-on);
   animation: pulse 2s infinite;
 }
 
 .connection-text {
   font-size: 0.75rem;
-  color: var(--industrial-success);
+  color: var(--status-on);
   font-weight: 600;
   letter-spacing: 0.5px;
 }

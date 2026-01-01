@@ -1,11 +1,12 @@
 import { createApp } from "vue";
 import { createPinia } from "pinia";
-import "./style.css";
 import App from "./App.vue";
 
 // Import Bootstrap CSS & JS
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap";
+
+import "./style.css";
 
 // Kita siapkan router (nanti kita isi)
 import router from "./router";

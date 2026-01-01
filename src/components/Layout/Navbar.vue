@@ -107,8 +107,8 @@ onUnmounted(() => {
 
 <style scoped>
 .navbar-industrial {
-  background: linear-gradient(135deg, var(--industrial-dark) 0%, #1e293b 100%);
-  border-bottom: 3px solid var(--industrial-accent);
+  background: var(--bg-sidebar);
+  border-bottom: 3px solid var(--primary);
   padding: 0.75rem 1.5rem;
   box-shadow: var(--shadow-lg);
 }
@@ -188,13 +188,13 @@ onUnmounted(() => {
 }
 
 .status-on {
-  background: var(--industrial-success);
-  box-shadow: 0 0 10px var(--industrial-success);
+  background: var(--status-on);
+  box-shadow: 0 0 10px var(--status-on);
 }
 
 .status-off {
-  background: var(--industrial-danger);
-  box-shadow: 0 0 10px var(--industrial-danger);
+  background: var(--status-off);
+  box-shadow: 0 0 10px var(--status-off);
 }
 
 .status-text {

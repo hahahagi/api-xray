@@ -1,58 +1,100 @@
 <template>
   <div class="report-analytics">
-    <div class="row">
-      <div class="col-md-8">
-        <div class="card">
-          <div class="card-header">
-            <h6 class="mb-0">Production Trend</h6>
+    <div class="row g-4">
+      <div class="col-12 col-lg-8">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-header bg-white py-3">
+            <h6 class="mb-0 fw-bold text-primary">
+              <i class="bi bi-graph-up-arrow me-2"></i>Production Trend
+            </h6>
           </div>
           <div class="card-body">
-            <canvas ref="trendChart"></canvas>
+            <div style="position: relative; height: 300px; width: 100%">
+              <canvas ref="trendChart"></canvas>
+            </div>
           </div>
         </div>
       </div>
-      <div class="col-md-4">
-        <div class="card">
-          <div class="card-header">
-            <h6 class="mb-0">Quality Distribution</h6>
+      <div class="col-12 col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-header bg-white py-3">
+            <h6 class="mb-0 fw-bold text-primary">
+              <i class="bi bi-pie-chart me-2"></i>Quality Distribution
+            </h6>
           </div>
           <div class="card-body">
-            <canvas ref="qualityChart"></canvas>
+            <div style="position: relative; height: 300px; width: 100%">
+              <canvas ref="qualityChart"></canvas>
+            </div>
           </div>
         </div>
       </div>
     </div>
-    
+
     <div class="row mt-4">
-      <div class="col-md-12">
-        <div class="card">
-          <div class="card-header">
-            <h6 class="mb-0">Performance Metrics</h6>
+      <div class="col-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-white py-3">
+            <h6 class="mb-0 fw-bold text-primary">
+              <i class="bi bi-speedometer2 me-2"></i>Performance Metrics
+            </h6>
           </div>
           <div class="card-body">
-            <div class="row">
-              <div class="col-md-3">
-                <div class="metric-card text-center p-3">
-                  <div class="metric-value h2 text-primary">{{ avgQuality }}%</div>
-                  <div class="metric-label text-muted">Avg Quality Rate</div>
+            <div class="row g-3">
+              <div class="col-12 col-sm-6 col-md-3">
+                <div
+                  class="metric-card text-center p-4 bg-light rounded border h-100"
+                >
+                  <div class="metric-value h2 text-primary fw-bold mb-1">
+                    {{ avgQuality }}%
+                  </div>
+                  <div
+                    class="metric-label text-muted small text-uppercase fw-bold"
+                  >
+                    Avg Quality Rate
+                  </div>
                 </div>
               </div>
-              <div class="col-md-3">
-                <div class="metric-card text-center p-3">
-                  <div class="metric-value h2 text-success">{{ avgProduction }}</div>
-                  <div class="metric-label text-muted">Avg Daily Production</div>
+              <div class="col-12 col-sm-6 col-md-3">
+                <div
+                  class="metric-card text-center p-4 bg-light rounded border h-100"
+                >
+                  <div class="metric-value h2 text-success fw-bold mb-1">
+                    {{ avgProduction }}
+                  </div>
+                  <div
+                    class="metric-label text-muted small text-uppercase fw-bold"
+                  >
+                    Avg Daily Production
+                  </div>
                 </div>
               </div>
-              <div class="col-md-3">
-                <div class="metric-card text-center p-3">
-                  <div class="metric-value h2 text-info">{{ bestDay }}</div>
-                  <div class="metric-label text-muted">Best Day (Units)</div>
+              <div class="col-12 col-sm-6 col-md-3">
+                <div
+                  class="metric-card text-center p-4 bg-light rounded border h-100"
+                >
+                  <div class="metric-value h2 text-info fw-bold mb-1">
+                    {{ bestDay }}
+                  </div>
+                  <div
+                    class="metric-label text-muted small text-uppercase fw-bold"
+                  >
+                    Best Day (Units)
+                  </div>
                 </div>
               </div>
-              <div class="col-md-3">
-                <div class="metric-card text-center p-3">
-                  <div class="metric-value h2 text-warning">{{ oeeScore }}%</div>
-                  <div class="metric-label text-muted">Estimated OEE</div>
+              <div class="col-12 col-sm-6 col-md-3">
+                <div
+                  class="metric-card text-center p-4 bg-light rounded border h-100"
+                >
+                  <div class="metric-value h2 text-warning fw-bold mb-1">
+                    {{ oeeScore }}%
+                  </div>
+                  <div
+                    class="metric-label text-muted small text-uppercase fw-bold"
+                  >
+                    Estimated OEE
+                  </div>
                 </div>
               </div>
             </div>
@@ -64,93 +106,95 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { Chart, registerables } from 'chart.js'
+import { ref, onMounted } from "vue";
+import { Chart, registerables } from "chart.js";
 
-Chart.register(...registerables)
+Chart.register(...registerables);
 
-const trendChart = ref(null)
-const qualityChart = ref(null)
+const trendChart = ref(null);
+const qualityChart = ref(null);
 
-const avgQuality = ref(95.2)
-const avgProduction = ref(1250)
-const bestDay = ref(1820)
-const oeeScore = ref(88.5)
+const avgQuality = ref(95.2);
+const avgProduction = ref(1250);
+const bestDay = ref(1820);
+const oeeScore = ref(88.5);
 
-let trendChartInstance = null
-let qualityChartInstance = null
+let trendChartInstance = null;
+let qualityChartInstance = null;
 
 onMounted(() => {
-  initCharts()
-})
+  initCharts();
+});
 
 const initCharts = () => {
   // Trend Chart
   if (trendChart.value) {
-    const ctx = trendChart.value.getContext('2d')
-    
+    const ctx = trendChart.value.getContext("2d");
+
     trendChartInstance = new Chart(ctx, {
-      type: 'line',
+      type: "line",
       data: {
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
         datasets: [
           {
-            label: 'Production',
+            label: "Production",
             data: [1200, 1450, 1350, 1650, 1820, 950, 1100],
-            borderColor: '#3b82f6',
-            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            borderColor: "#3b82f6",
+            backgroundColor: "rgba(59, 130, 246, 0.1)",
             borderWidth: 2,
             fill: true,
-            tension: 0.4
+            tension: 0.4,
           },
           {
-            label: 'Target',
+            label: "Target",
             data: [1400, 1400, 1400, 1400, 1400, 1400, 1400],
-            borderColor: '#ef4444',
+            borderColor: "#ef4444",
             borderWidth: 1,
             borderDash: [5, 5],
-            fill: false
-          }
-        ]
+            fill: false,
+          },
+        ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
           legend: {
-            position: 'top',
-          }
-        }
-      }
-    })
+            position: "top",
+          },
+        },
+      },
+    });
   }
-  
+
   // Quality Chart
   if (qualityChart.value) {
-    const ctx = qualityChart.value.getContext('2d')
-    
+    const ctx = qualityChart.value.getContext("2d");
+
     qualityChartInstance = new Chart(ctx, {
-      type: 'doughnut',
+      type: "doughnut",
       data: {
-        labels: ['OK (95.2%)', 'NG (4.8%)'],
-        datasets: [{
-          data: [95.2, 4.8],
-          backgroundColor: ['#10b981', '#ef4444'],
-          borderWidth: 1
-        }]
+        labels: ["OK (95.2%)", "NG (4.8%)"],
+        datasets: [
+          {
+            data: [95.2, 4.8],
+            backgroundColor: ["#10b981", "#ef4444"],
+            borderWidth: 1,
+          },
+        ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
           legend: {
-            position: 'bottom'
-          }
-        }
-      }
-    })
+            position: "bottom",
+          },
+        },
+      },
+    });
   }
-}
+};
 </script>
 
 <style scoped>
@@ -163,7 +207,7 @@ const initCharts = () => {
 
 .metric-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .metric-label {

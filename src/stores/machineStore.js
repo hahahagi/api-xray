@@ -17,14 +17,14 @@ export const useMachineStore = defineStore("machine", {
       jam_terencana: 0,
       target_produksi: 0,
       aktual_produksi: 0,
-      lastUpdated: null
+      lastUpdated: null,
     },
     oeeData: {
       availability: 0,
       performance: 0,
       quality: 0,
-      oee: 0
-    }
+      oee: 0,
+    },
   }),
 
   getters: {
@@ -38,22 +38,26 @@ export const useMachineStore = defineStore("machine", {
       const total = state.dashboardData.ban_ok + state.dashboardData.ban_ng;
       if (total === 0) {
         return {
-          labels: ['OK', 'NG'],
-          datasets: [{
-            data: [0, 0],
-            backgroundColor: ['#41b883', '#e74c3c']
-          }]
+          labels: ["OK", "NG"],
+          datasets: [
+            {
+              data: [0, 0],
+              backgroundColor: ["#41b883", "#e74c3c"],
+            },
+          ],
         };
       }
-      
+
       return {
-        labels: ['OK', 'NG'],
-        datasets: [{
-          data: [state.dashboardData.ban_ok, state.dashboardData.ban_ng],
-          backgroundColor: ['#41b883', '#e74c3c']
-        }]
+        labels: ["OK", "NG"],
+        datasets: [
+          {
+            data: [state.dashboardData.ban_ok, state.dashboardData.ban_ng],
+            backgroundColor: ["#41b883", "#e74c3c"],
+          },
+        ],
       };
-    }
+    },
   },
 
   actions: {
@@ -73,7 +77,7 @@ export const useMachineStore = defineStore("machine", {
           // Update status dari response database
           this.machineStatus = response.data.saved_status;
           console.log("✅ Machine status updated in DB:", response.data);
-          
+
           // Refresh data setelah update
           await this.fetchDashboardData();
         } else {
@@ -98,7 +102,7 @@ export const useMachineStore = defineStore("machine", {
         console.log("📊 API Response:", response.data);
         const api = response.data;
         if (api) {
-          // New API format: keys like '1_status_monitoring', '2_waktu_operasi', '5_total_ban_check', '6_quality_ok', '6_quality_ng'
+          // Primary API format (Numbered Keys from api-hosting.php)
           if (api["1_status_monitoring"] !== undefined) {
             this.machineStatus = api["1_status_monitoring"];
 
@@ -110,29 +114,68 @@ export const useMachineStore = defineStore("machine", {
               runtimeMinutes = m ? parseFloat(m[0]) : 0;
             }
 
+            // Parse downtime minutes
+            let downtimeMinutes = 0;
+            if (api["3_waktu_downtime"] !== undefined) {
+              const raw = String(api["3_waktu_downtime"]);
+              const m = raw.match(/[\d\.]+/);
+              downtimeMinutes = m ? parseFloat(m[0]) : 0;
+            }
+
             const runtimeHours = runtimeMinutes / 60;
 
-            const totalBanCheck = parseInt(api["5_total_ban_check"] ?? 0, 10) || 0;
+            const totalBanCheck =
+              parseInt(api["5_total_ban_check"] ?? 0, 10) || 0;
             const banOk = parseInt(api["6_quality_ok"] ?? 0, 10) || 0;
             const banNg = parseInt(api["6_quality_ng"] ?? 0, 10) || 0;
 
             // If API doesn't provide planned time, use store's shiftHours
             const plannedHours = this.shiftHours || 8;
 
+            // Calculate target production based on planned hours and ideal speed (e.g., 10 tires/min)
+            const idealSpeedPerMin = 10;
+            const targetProduksi = plannedHours * 60 * idealSpeedPerMin;
+
             this.dashboardData = {
               total_ban_terinspeksi: totalBanCheck,
               ban_ok: banOk,
               ban_ng: banNg,
-              // store hours (not minutes) for consistency with calculateOEE
               jam_operasi: parseFloat(runtimeHours.toFixed(2)),
+              downtime_minutes: downtimeMinutes, // Added this line
               jam_terencana: plannedHours,
-              // treat total_ban_check as aktual_produksi when target/aktual not provided
-              target_produksi: this.dashboardData.target_produksi || 0,
+              target_produksi: targetProduksi,
               aktual_produksi: totalBanCheck,
-              lastUpdated: new Date().toLocaleTimeString()
+              lastUpdated: new Date().toLocaleTimeString(),
             };
 
-            // Compute OEE
+            this.calculateOEE();
+          }
+          // Alternative/Clean API format (if needed in future)
+          else if (api.machine_status !== undefined) {
+            this.machineStatus = api.machine_status;
+
+            const runtimeMinutes = parseFloat(api.runtime_minutes || 0);
+            const runtimeHours = runtimeMinutes / 60;
+
+            const totalBanCheck = parseInt(api.total_checked || 0, 10);
+            const banOk = parseInt(api.total_ok || 0, 10);
+            const banNg = parseInt(api.total_ng || 0, 10);
+
+            const plannedHours = this.shiftHours || 8;
+            const idealSpeedPerMin = 10;
+            const targetProduksi = plannedHours * 60 * idealSpeedPerMin;
+
+            this.dashboardData = {
+              total_ban_terinspeksi: totalBanCheck,
+              ban_ok: banOk,
+              ban_ng: banNg,
+              jam_operasi: parseFloat(runtimeHours.toFixed(2)),
+              jam_terencana: plannedHours,
+              target_produksi: targetProduksi,
+              aktual_produksi: totalBanCheck,
+              lastUpdated: new Date().toLocaleTimeString(),
+            };
+
             this.calculateOEE();
           } else {
             // Fallback: older API shape or direct field names
@@ -144,7 +187,7 @@ export const useMachineStore = defineStore("machine", {
               jam_terencana: api.jam_terencana || this.shiftHours || 8,
               target_produksi: api.target_produksi || 0,
               aktual_produksi: api.aktual_produksi || 0,
-              lastUpdated: new Date().toLocaleTimeString()
+              lastUpdated: new Date().toLocaleTimeString(),
             };
 
             if (api.machineStatus) this.machineStatus = api.machineStatus;
@@ -162,7 +205,7 @@ export const useMachineStore = defineStore("machine", {
     // Hitung OEE berdasarkan rumus
     calculateOEE() {
       const data = this.dashboardData;
-      
+
       // 1. Availability = (Actual Operating Time / Planned Production Time) × 100
       let availability = 0;
       if (data.jam_terencana > 0) {
@@ -186,13 +229,19 @@ export const useMachineStore = defineStore("machine", {
       const oee = (availability * performance * quality) / 10000;
 
       this.oeeData = {
-        availability: Math.min(100, Math.max(0, parseFloat(availability.toFixed(2)))),
-        performance: Math.min(100, Math.max(0, parseFloat(performance.toFixed(2)))),
+        availability: Math.min(
+          100,
+          Math.max(0, parseFloat(availability.toFixed(2)))
+        ),
+        performance: Math.min(
+          100,
+          Math.max(0, parseFloat(performance.toFixed(2)))
+        ),
         quality: Math.min(100, Math.max(0, parseFloat(quality.toFixed(2)))),
-        oee: Math.min(100, Math.max(0, parseFloat(oee.toFixed(2))))
+        oee: Math.min(100, Math.max(0, parseFloat(oee.toFixed(2)))),
       };
 
       console.log("🧮 OEE Calculated:", this.oeeData);
-    }
-  }
+    },
+  },
 });
