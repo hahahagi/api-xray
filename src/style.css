@@ -1,0 +1,93 @@
+/* Industrial Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@300;400;500&display=swap');
+
+/* style.css - Global Styles */
+:root {
+  /* Industrial Theme Colors */
+  --industrial-blue: #1a237e;
+  --industrial-dark: #121828;
+  --industrial-gray: #2d3748;
+  --industrial-light: #4a5568;
+  --industrial-accent: #2196f3;
+  --industrial-success: #4caf50;
+  --industrial-warning: #ff9800;
+  --industrial-danger: #f44336;
+  --industrial-bg: #f5f7fa;
+  --gauge-green: #00e676;
+  --gauge-yellow: #ffeb3b;
+  --gauge-red: #ff5252;
+  
+  /* Shadows */
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+  
+  /* Border Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  
+  /* Transitions */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+.industrial-font {
+  font-family: 'Inter', sans-serif;
+}
+
+.mono-font {
+  font-family: 'Roboto Mono', monospace;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Utility Classes */
+.text-gradient {
+  background: linear-gradient(45deg, var(--industrial-accent), #64b5f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.glow {
+  box-shadow: 0 0 20px rgba(33, 150, 243, 0.3);
+}
+
+.glow-success {
+  box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+}
+
+.glow-danger {
+  box-shadow: 0 0 20px rgba(244, 67, 54, 0.3);
+}
